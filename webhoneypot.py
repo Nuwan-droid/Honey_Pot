@@ -36,7 +36,7 @@ def web_honeypot(input_username="admin",input_password="password"):
 
         if username == input_username and password == input_password:
             funnel_logger.info(f"Successful login by {ip_address} with username: {username} and password: {password}")
-            return 'DEEobodaH says Welcome!'
+            return ' Welcome!'
         else:
             funnel_logger.info(f"Failed login attempt by {ip_address} with username: {username} and password: {password}")
             return 'Invalid credintials, Try again.'
