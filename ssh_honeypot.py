@@ -1,6 +1,7 @@
 # libraries
 import logging
 from logging.handlers import RotatingFileHandler
+from pathlib import Path
 import paramiko
 import socket
 import threading
@@ -8,8 +9,20 @@ import threading
 # constraints
 logging_format = logging.Formatter('%(message)s')
 SSH_BANNER = "SSH-2.0-OpenSSH_7.4"
-# host_key file expected in repo root
-host_key = paramiko.RSAKey(filename='server.key')
+# host_key file expected in repo root; resolve relative to this file so running from
+# another working directory does not break key loading
+BASE_DIR = Path(__file__).resolve().parent
+HOST_KEY_PATH = BASE_DIR / "server.key"
+try:
+     host_key = paramiko.RSAKey.from_private_key_file(str(HOST_KEY_PATH))
+except FileNotFoundError as exc:
+     raise FileNotFoundError(
+          f"Host key not found at {HOST_KEY_PATH}. Generate one with 'ssh-keygen -t rsa -b 2048 -f server.key'."
+     ) from exc
+except paramiko.PasswordRequiredException as exc:
+     raise RuntimeError(
+          f"Host key at {HOST_KEY_PATH} is encrypted with a passphrase; supply an unencrypted key for the honeypot."
+     ) from exc
 
 
 # loggers and audit files

@@ -17,3 +17,38 @@ funnel_logger.addHandler(funnel_handler)
  
 
 #baseline honeypot
+
+def web_honeypot(input_username="admin",input_password="password"):
+    app = Flask(__name__)
+
+    @app.route('/')
+
+    def index():
+        return render_template('wp_honey.html')
+      
+    @app.route('/wp-admin-login',methods=['POST'])
+
+    def login():
+        username = request.form.get['username']
+        password = request.form.get['password']
+
+        ip_address = request.remote_addr
+
+        if username == input_username and password == input_password:
+            funnel_logger.info(f"Successful login by {ip_address} with username: {username} and password: {password}")
+            return 'DEEobodaH says Welcome!'
+        else:
+            funnel_logger.info(f"Failed login attempt by {ip_address} with username: {username} and password: {password}")
+            return 'Invalid credintials, Try again.'
+        
+    return app
+
+def run_web_honeypot(port=5000,input_username="admin",input_password="password"):
+    run_web_honeypot_app=web_honeypot(input_username,input_password)
+    run_web_honeypot_app.run(debug=True,port=port,host="0.0.0.0")
+
+    return run_web_honeypot_app
+
+
+run_web_honeypot(port=5000,input_username="admin",input_password="password")
+    

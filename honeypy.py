@@ -1,6 +1,7 @@
 #Libraries
 import argparse 
-from  ssh_honeypot import *
+from ssh_honeypot import *
+from webhoneypot import *
 
 #Parse arguments
 
@@ -12,8 +13,11 @@ if __name__ == "__main__":
    parser.add_argument('-u','--username',type=str)
    parser.add_argument('-pw','--password',type=str)
    
+   #ssh honeypot
    parser.add_argument('-s','--ssh',action='store_true',help='Enable SSH Honeypot')
-   parser.add_argument('-w','--http',action='store_true')
+   
+   #Web-based honeypot
+   parser.add_argument('-w','--http',action='store_true',help='Enable HTTP Honeypot')
 
    args = parser.parse_args()
 
@@ -27,8 +31,14 @@ if __name__ == "__main__":
                 args.password=None
                 
        elif args.http:
-              print("[-] Running HTTP Honeypot...")
-              pass 
+           print("[-] Running HTTP Honeypot...")
+           if not args.username:
+                args.username="admin"
+           if not args.password:
+                args.password="password"
+           print(f"Port{args.port},Username:{args.username},Password:{args.password}")
+           run_web_honeypot(port=args.port,input_username=args.username,input_password=args.password)
+
        else:
              print("[-] please choose a honeypot SSH or HTTP")
 
